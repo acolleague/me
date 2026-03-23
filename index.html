@@ -1,1 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Colleague | Systems & AI</title>
+    <style>
+        /* --- CSS Variables & Themes --- */
+        :root {
+            --bg: #0a0a0a;
+            --text: #e5e5e5;
+            --text-dim: #a3a3a3;
+            --accent: #3b82f6; 
+            --card-bg: #171717;
+            --border: #262626;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --text: #171717;
+            --text-dim: #525252;
+            --accent: #2563eb;
+            --card-bg: #f5f5f5;
+            --border: #e5e5e5;
+        }
+
+        /* --- Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        section {
+            margin-bottom: 120px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Components --- */
+        nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 60px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: var(--transition);
+            backdrop-filter: blur(8px);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            background: var(--card-bg);
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 { font-size: 2.5rem; line-height: 1.1; }
+        h2 { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        p { margin-bottom: 1.5rem; font-size: 1.1rem; }
+
+        .highlight { color: var(--text); font-weight: 600; }
+
+        .quote {
+            font-style: italic;
+            border-left: 2px solid var(--accent);
+            padding-left: 20px;
+            margin: 40px 0;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .card p { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 0; }
+
+        .links-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        textarea { height: 100px; resize: vertical; }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            section { margin-bottom: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <button class="theme-toggle" id="themeToggle">Light Mode</button>
+        </nav>
+
+        <!-- About Me -->
+        <section id="about">
+            <h1>I don’t do things the standard way.</h1>
+            <p>I’m interested in understanding how things work, and then <span class="highlight">rebuilding them better</span>.</p>
+            <p>Most of what I do sits at the edge of what’s possible today. AI is a tool, not the destination. The real goal is <strong>leverage</strong>—finding ways to create more impact with less friction.</p>
+            <div class="quote">
+                “The people who are crazy enough to think they can change things are the ones who do.”
+            </div>
+            <p style="color: var(--text-dim)">Outside of work, I’m drawn to ideas, systems, and conversations that shift perspective. I like building, questioning assumptions, and pushing into uncomfortable territory.</p>
+        </section>
+
+        <!-- What I Do -->
+        <section id="work">
+            <h2>What I Do</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>AI Systems Design</h3>
+                    <p>I design and build systems powered by AI that actually solve business bottlenecks.</p>
+                </div>
+                <div class="card">
+                    <h3>Rapid Prototyping</h3>
+                    <p>I experiment with ideas quickly and turn them into working, functional prototypes.</p>
+                </div>
+                <div class="card">
+                    <h3>Output Multipliers</h3>
+                    <p>I focus on leverage—tools and workflows that multiply individual and team output.</p>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; font-size: 0.95rem; color: var(--text-dim);">
+                Interested in: <span class="highlight">AI-native products, automation, creative tech, and new productivity paradigms.</span>
+            </p>
+        </section>
+
+        <!-- Ideas / Thinking -->
+        <section id="thinking">
+            <h2>Ideas / Thinking</h2>
+            <ul style="list-style: none;">
+                <li style="margin-bottom: 2rem;">
+                    <p style="margin-bottom: 0;"><strong>AI doesn’t replace thinking</strong></p>
+                    <p style="font-size: 0.95rem; color: var(--text-dim);">It punishes people who don’t think.</p>
+                </li>
+                <li style="margin-bottom: 2rem;">
+                    <p style="margin-bottom: 0;"><strong>Speed is a strategy</strong></p>
+                    <p style="font-size: 0.95rem; color: var(--text-dim);">The gap between idea and execution is where almost everything dies.</p>
+                </li>
+                <li style="margin-bottom: 2rem;">
+                    <p style="margin-bottom: 0;"><strong>Do badly, repeatedly</strong></p>
+                    <p style="font-size: 0.95rem; color: var(--text-dim);">You don’t learn by thinking about doing. You learn by doing.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Now -->
+        <section id="now">
+            <h2>Now</h2>
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <ul style="list-style: none; font-size: 0.95rem;">
+                    <li style="margin-bottom: 12px;">🛠 <strong>Building:</strong> A home for colleagues</li>
+                    <li style="margin-bottom: 12px;">🔍 <strong>Exploring:</strong> AI workflows / product ideas / new tools</li>
+                    <li style="margin-bottom: 12px;">📚 <strong>Learning:</strong> How to move faster without breaking quality</li>
+                    <li>🧠 <strong>Thinking:</strong> How far AI can actually go in replacing workflows</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Connect -->
+        <section id="connect">
+            <h2>Connect</h2>
+            <p>If you’re building, thinking differently, or exploring similar ideas—I’d like to hear from you.</p>
+            
+            <div class="links-group">
+                <a href="mailto:acolleague@iamcool.com" class="btn">Email</a>
+                <a href="https://twitter.com/colleague" class="btn" target="_blank">Twitter / X</a>
+                <a href="https://linkedin.com/in/the-colleague" class="btn" target="_blank">LinkedIn</a>
+            </div>
+
+            <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Message sent!');">
+                <input type="text" placeholder="Your Name" required>
+                <textarea placeholder="Send me something you’re working on..." required></textarea>
+                <button type="submit" class="btn" style="background: var(--text); color: var(--bg); font-weight: bold; cursor: pointer; width: fit-content;">Send Message</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                themeToggle.innerText = 'Light Mode';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.innerText = 'Dark Mode';
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
