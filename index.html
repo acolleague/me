@@ -155,6 +155,7 @@
             color: white;
         }
 
+        /* --- Form --- */
         form {
             display: grid;
             gap: 12px;
@@ -176,6 +177,20 @@
         input:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
+        }
+
+        .submit-btn {
+            background: var(--text); 
+            color: var(--bg); 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: fit-content;
+            border: none;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent);
+            color: white;
         }
 
         @media (max-width: 600px) {
@@ -262,20 +277,27 @@
             <p>If you’re building, thinking differently, or exploring similar ideas—I’d like to hear from you.</p>
             
             <div class="links-group">
-                <a href="mailto:acolleague@iamcool.com" class="btn">Email</a>
+                <a href="mailto:aicolleague@proton.me" class="btn">Email</a>
                 <a href="https://twitter.com/colleague" class="btn" target="_blank">Twitter / X</a>
                 <a href="https://linkedin.com/in/the-colleague" class="btn" target="_blank">LinkedIn</a>
             </div>
 
-            <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Message sent!');">
-                <input type="text" placeholder="Your Name" required>
-                <textarea placeholder="Send me something you’re working on..." required></textarea>
-                <button type="submit" class="btn" style="background: var(--text); color: var(--bg); font-weight: bold; cursor: pointer; width: fit-content;">Send Message</button>
+            <!-- Formspree Integration -->
+            <form action="https://formspree.io/f/aicolleague@proton.me" method="POST">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="_replyto" placeholder="Your Email" required>
+                <textarea name="message" placeholder="Send me something you’re working on..." required></textarea>
+                
+                <!-- Anti-spam and custom subject -->
+                <input type="hidden" name="_subject" value="New message from your personal website">
+                
+                <button type="submit" class="btn submit-btn">Send Message</button>
             </form>
         </section>
     </div>
 
     <script>
+        // Theme Toggle
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
         
@@ -289,6 +311,7 @@
             }
         });
 
+        // Scroll Animations
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
