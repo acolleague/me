@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK VAT Calculator</title>
+    <style>
+        :root {
+            --gov-blue: #005ea5;
+            --gov-grey: #f3f2f1;
+            --text-color: #0b0c0c;
+            --white: #ffffff;
+            --border: #b1b4b6;
+        }
+
+        body {
+            font-family: "GDS Transport", Arial, sans-serif;
+            background-color: var(--gov-grey);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .calculator-container {
+            background: var(--white);
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-top: 10px solid var(--gov-blue);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            font-size: 14px;
+            padding: 5px 10px;
+            background: #eef7ff;
+            border-left: 4px solid var(--gov-blue);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .toggle-container {
+            display: flex;
+            margin-bottom: 25px;
+            background: #eee;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: var(--gov-blue);
+            color: white;
+            border-radius: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            font-size: 18px;
+            box-sizing: border-box;
+            border-radius: 0;
+        }
+
+        input:focus {
+            outline: 3px solid #ffdd00;
+            border-color: var(--text-color);
+        }
+
+        .results-box {
+            background: #f8f8f8;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-top: 25px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .result-row.total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--border);
+            font-weight: bold;
+            font-size: 22px;
+            color: var(--gov-blue);
+        }
+
+        .currency-symbol {
+            position: relative;
+        }
+
+        .currency-symbol::before {
+            content: "£";
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            color: #555;
+        }
+
+        .padded-input {
+            padding-left: 30px !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h1>UK VAT Calculator</h1>
+    
+    <span id="rate-status" class="status-badge">Fetching live UK rate...</span>
+
+    <div class="toggle-container">
+        <button id="btn-add" class="toggle-btn active" onclick="setMode('add')">Add VAT<br><small>(Net to Gross)</small></button>
+        <button id="btn-remove" class="toggle-btn" onclick="setMode('remove')">Extract VAT<br><small>(Gross to Net)</small></button>
+    </div>
+
+    <div class="input-group">
+        <label id="amount-label">Amount (excluding VAT)</label>
+        <div class="currency-symbol">
+            <input type="number" id="amount" class="padded-input" placeholder="0.00" step="0.01" oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>VAT Rate (%)</label>
+        <input type="number" id="vat-rate" value="20" step="0.5" oninput="calculate()">
+    </div>
+
+    <div class="results-box">
+        <div class="result-row">
+            <span id="res-vat-label">VAT Amount:</span>
+            <span id="res-vat-val">£0.00</span>
+        </div>
+        <div class="result-row total">
+            <span id="res-total-label">Total (Gross):</span>
+            <span id="res-total-val">£0.00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let mode = 'add'; // 'add' or 'remove'
+
+    // 1. Fetch live rate on load
+    window.onload = async () => {
+        const rateStatus = document.getElementById('rate-status');
+        const rateInput = document.getElementById('vat-rate');
+
+        try {
+            // Using a public VAT API for UK rates
+            const response = await fetch('https://api.vatlookup.eu/rates/gb');
+            const data = await response.json();
+            
+            // Look for the "Standard" rate
+            const standardRate = data.rates.find(r => r.name === "Standard").rates[0];
+            
+            if (standardRate) {
+                rateInput.value = standardRate;
+                rateStatus.innerText = `Live UK Standard Rate: ${standardRate}%`;
+            }
+        } catch (error) {
+            console.warn("Could not fetch live rate, using 20% default.");
+            rateStatus.innerText = "UK Standard Rate: 20% (Default)";
+            rateInput.value = 20;
+        }
+        calculate();
+    };
+
+    // 2. Handle Mode Switching
+    function setMode(newMode) {
+        mode = newMode;
+        
+        // Update UI buttons
+        document.getElementById('btn-add').classList.toggle('active', mode === 'add');
+        document.getElementById('btn-remove').classList.toggle('active', mode === 'remove');
+
+        // Update Labels
+        const amountLabel = document.getElementById('amount-label');
+        const vatLabel = document.getElementById('res-vat-label');
+        const totalLabel = document.getElementById('res-total-label');
+
+        if (mode === 'add') {
+            amountLabel.innerText = "Amount (excluding VAT)";
+            vatLabel.innerText = "VAT to Add:";
+            totalLabel.innerText = "Total (Gross):";
+        } else {
+            amountLabel.innerText = "Amount (including VAT)";
+            vatLabel.innerText = "VAT included:";
+            totalLabel.innerText = "Amount (Net):";
+        }
+
+        calculate();
+    }
+
+    // 3. Calculation Logic
+    function calculate() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const rate = parseFloat(document.getElementById('vat-rate').value) || 0;
+        
+        let vatAmount = 0;
+        let finalTotal = 0;
+
+        if (mode === 'add') {
+            // Amount is Net, calculate Gross
+            vatAmount = amount * (rate / 100);
+            finalTotal = amount + vatAmount;
+        } else {
+            // Amount is Gross, extract Net
+            // Formula: Net = Gross / (1 + rate)
+            const netAmount = amount / (1 + (rate / 100));
+            vatAmount = amount - netAmount;
+            finalTotal = netAmount;
+        }
+
+        // Display results
+        document.getElementById('res-vat-val').innerText = formatCurrency(vatAmount);
+        document.getElementById('res-total-val').innerText = formatCurrency(finalTotal);
+    }
+
+    function formatCurrency(num) {
+        return '£' + num.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+</script>
+
+</body>
+</html>
