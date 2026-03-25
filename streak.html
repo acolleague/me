@@ -1,1 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streak Wager | Real Stakes Habit Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
+            --accent: #FFBF00; /* Amber Gold */
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+        }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 450px;
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        /* Setup Phase */
+        #setup-ui { display: block; }
+        #tracker-ui { display: none; }
+
+        h1 {
+            font-size: 1.2rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .habit-display {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem 10px;
+            border-radius: 16px;
+            border: 1px solid #333;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .streak-fire {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px var(--accent));
+        }
+
+        .money-saved { color: var(--success); }
+        .debt-owed { color: var(--danger); }
+
+        .check-in-btn {
+            background: var(--accent);
+            color: black;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 2rem;
+        }
+
+        .check-in-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 191, 0, 0.3);
+        }
+
+        .check-in-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .day-box {
+            aspect-ratio: 1/1;
+            background: #222;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .day-box.success { border: 1px solid var(--success); color: var(--success); }
+        .day-box.fail { border: 1px solid var(--danger); color: var(--danger); animation: shake 0.5s ease; }
+
+        /* Setup Form Styles */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .share-btn {
+            background: transparent;
+            border: 1px solid #444;
+            color: var(--text-dim);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shame-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(231, 76, 60, 0.2);
+            pointer-events: none;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shame-overlay" id="shame-overlay"></div>
+
+    <div class="container">
+        <!-- SETUP VIEW -->
+        <div id="setup-ui">
+            <h1>Create Your Wager</h1>
+            <input type="text" id="setup-habit" placeholder="Habit (e.g. Meditate 10m)">
+            <input type="number" id="setup-stake" placeholder="Stake per miss ($)">
+            <input type="text" id="setup-charity" placeholder="Anti-Charity Name">
+            <button class="check-in-btn" onclick="initTracker()">Start Wager</button>
+        </div>
+
+        <!-- TRACKER VIEW -->
+        <div id="tracker-ui">
+            <h1 id="habit-title">HABIT</h1>
+            <div id="habit-name" class="habit-display">Loading...</div>
+            
+            <span class="streak-fire">🔥</span>
+            <div class="stat-value" style="font-size: 4rem; margin-bottom: 2rem;" id="streak-count">0</div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Money Saved</div>
+                    <div class="stat-value money-saved" id="money-saved">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Debt Owed</div>
+                    <div class="stat-value debt-owed" id="debt-owed">$0</div>
+                </div>
+            </div>
+
+            <button id="check-in-btn" class="check-in-btn" onclick="checkIn()">CHECK IN TODAY</button>
+
+            <div class="stat-label" style="text-align: left;">Last 7 Days</div>
+            <div class="history-grid" id="history-grid">
+                <!-- JS populated -->
+            </div>
+
+            <button class="share-btn" onclick="shareProgress()">Copy Share Summary</button>
+            <p style="font-size: 0.6rem; color: #555; margin-top: 20px;" onclick="resetApp()">RESET EVERYTHING</p>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            habit: "",
+            stake: 0,
+            antiCharity: "",
+            streak: 0,
+            totalDebt: 0,
+            history: {}, // Format: {"2023-10-25": true}
+            lastVisit: null
+        };
+
+        function initTracker() {
+            state.habit = document.getElementById('setup-habit').value || "Meditate";
+            state.stake = parseFloat(document.getElementById('setup-stake').value) || 5;
+            state.antiCharity = document.getElementById('setup-charity').value || "The Opposition";
+            state.lastVisit = new Date().toDateString();
+            save();
+            render();
+        }
+
+        function load() {
+            const saved = localStorage.getItem('streakWagerState');
+            if (saved) {
+                state = JSON.parse(saved);
+                calculateMissedDays();
+                render();
+            }
+        }
+
+        function save() {
+            localStorage.setItem('streakWagerState', JSON.stringify(state));
+        }
+
+        function calculateMissedDays() {
+            const today = new Date();
+            const lastCheckInDateStr = Object.keys(state.history).sort().pop();
+            
+            if (!lastCheckInDateStr) return;
+
+            const lastDate = new Date(lastCheckInDateStr);
+            const diffTime = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+
+            // If more than 1 day has passed since last check-in
+            if (diffTime > 1) {
+                let missedSomething = false;
+                for (let i = 1; i < diffTime; i++) {
+                    const missedDate = new Date(lastDate);
+                    missedDate.setDate(lastDate.getDate() + i);
+                    const dateKey = missedDate.toDateString();
+                    
+                    if (!state.history[dateKey]) {
+                        state.history[dateKey] = false;
+                        state.totalDebt += state.stake;
+                        state.streak = 0;
+                        missedSomething = true;
+                    }
+                }
+                if (missedSomething) {
+                    triggerShame();
+                    save();
+                }
+            }
+        }
+
+        function checkIn() {
+            const today = new Date().toDateString();
+            if (state.history[today]) return;
+
+            state.streak++;
+            state.history[today] = true;
+            save();
+            
+            // Success Animation
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#FFBF00', '#ffffff', '#2ecc71']
+            });
+
+            render();
+        }
+
+        function triggerShame() {
+            const overlay = document.getElementById('shame-overlay');
+            overlay.style.display = 'block';
+            setTimeout(() => overlay.style.display = 'none', 1000);
+        }
+
+        function render() {
+            if (!state.habit) {
+                document.getElementById('setup-ui').style.display = 'block';
+                document.getElementById('tracker-ui').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('setup-ui').style.display = 'none';
+            document.getElementById('tracker-ui').style.display = 'block';
+
+            document.getElementById('habit-name').innerText = state.habit;
+            document.getElementById('streak-count').innerText = state.streak;
+            document.getElementById('money-saved').innerText = `$${state.streak * state.stake}`;
+            document.getElementById('debt-owed').innerText = `$${state.totalDebt}`;
+
+            // Check-in button state
+            const today = new Date().toDateString();
+            const btn = document.getElementById('check-in-btn');
+            if (state.history[today]) {
+                btn.innerText = "COMPLETED TODAY";
+                btn.disabled = true;
+            } else {
+                btn.innerText = "CHECK IN TODAY";
+                btn.disabled = false;
+            }
+
+            // History Grid
+            const grid = document.getElementById('history-grid');
+            grid.innerHTML = '';
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const key = d.toDateString();
+                const box = document.createElement('div');
+                box.className = 'day-box';
+                
+                if (state.history[key] === true) {
+                    box.classList.add('success');
+                    box.innerText = '✅';
+                } else if (state.history[key] === false) {
+                    box.classList.add('fail');
+                    box.innerText = '❌';
+                } else {
+                    box.innerText = d.getDate();
+                }
+                grid.appendChild(box);
+            }
+        }
+
+        function shareProgress() {
+            const text = `🔥 Streak: ${state.streak} days on "${state.habit}"\n💰 Saved: $${state.streak * state.stake}\n💀 Debt to Charity: $${state.totalDebt}\nDon't let me fail!`;
+            navigator.clipboard.writeText(text);
+            alert("Summary copied to clipboard!");
+        }
+
+        function resetApp() {
+            if (confirm("Reset everything? Your progress and debt will be cleared.")) {
+                localStorage.removeItem('streakWagerState');
+                location.reload();
+            }
+        }
+
+        // Initialize
+        load();
+    </script>
+</body>
+</html>
