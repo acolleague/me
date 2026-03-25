@@ -5,216 +5,236 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Percentage Calculator</title>
     <style>
+        :root {
+            --primary-accent: #6366f1;    /* Indigo Brand Color */
+            --bg-color: #f8fafc;          
+            --card-bg: #ffffff;           
+            --text-main: #1e293b;         
+            --text-muted: #64748b;        
+            --input-border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #333;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #ffffff;
-        }
-
-        /* Header Styling */
-        .header-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .logo-box {
-            background-color: black;
-            color: #35b3ee; /* Light blue % symbol color */
-            width: 50px;
-            height: 50px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
-            font-weight: bold;
-            border-radius: 4px;
-            margin-right: 15px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
         }
 
         h1 {
-            font-size: 32px;
-            margin: 0;
-            letter-spacing: -0.5px;
+            font-size: 1.875rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            letter-spacing: -0.025em;
+            text-align: center;
         }
 
-        .sub-header {
-            color: #777;
-            font-size: 18px;
-            margin-bottom: 30px;
-        }
-
-        /* Calculation Row Styling */
         .calc-row {
-            background-color: #f1f1f1;
-            border: 1px solid #e3e3e3;
-            border-radius: 12px;
-            padding: 25px 30px;
-            margin-bottom: 15px;
+            background: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--input-border);
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            font-size: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .calc-row span {
-            margin: 0 8px;
+            font-weight: 500;
+            color: var(--text-main);
         }
 
+        /* Input Styling from VAT App */
         input {
-            width: 60px;
-            height: 35px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 18px;
-            padding: 0 5px;
-            text-align: center;
-        }
-
-        /* Larger output fields like the screenshot */
-        .output-field {
+            padding: 8px 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
             width: 80px;
-            background-color: #fff;
-            margin-left: 10px;
+            text-align: center;
+            transition: all 0.2s;
         }
 
+        input:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Read-only output box styling */
+        .output-box {
+            background: #f1f5f9;
+            border-color: var(--input-border);
+            font-weight: 700;
+            color: var(--primary-accent);
+            cursor: default;
+            width: 100px;
+        }
+
+        /* Calculate Button styling */
         button {
-            background-color: #3e74a1;
+            background-color: var(--primary-accent);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 10px 20px;
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            margin-left: auto; /* Push to the right */
-            transition: background 0.2s;
+            margin-left: auto; /* Pushes button and output to the right */
+            transition: opacity 0.2s;
         }
 
         button:hover {
-            background-color: #2e5a7e;
+            opacity: 0.9;
         }
 
-        /* Tips Bar */
-        .tips-bar {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-            color: #444;
-            margin-top: 30px;
+        /* Specific styles for the multiplier text */
+        .multiplier-text {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            font-style: italic;
         }
 
-        /* Responsive */
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .calc-row {
                 flex-direction: column;
-                gap: 15px;
                 text-align: center;
             }
             button {
-                margin: 0 auto;
+                margin: 10px 0;
+                width: 100%;
             }
+            .multiplier-text { text-align: center; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div class="logo-box">%</div>
-        <h1>Percentage Calculator</h1>
-    </div>
-    <p class="sub-header">Percentage Calculator is a free online tool to calculate percentages.</p>
+<div class="container">
+    <h1>Percentage Calculator</h1>
 
-    <!-- Calculator 1 -->
+    <!-- Row 1 -->
     <div class="calc-row">
         <span>What is</span>
-        <input type="number" id="c1_p" placeholder="">
+        <input type="number" id="c1_p" placeholder="0">
         <span>% of</span>
-        <input type="number" id="c1_v" placeholder="">
+        <input type="number" id="c1_v" placeholder="0">
         <span>?</span>
-        <button onclick="calc1()">CALCULATE</button>
-        <input type="text" id="c1_res" class="output-field" readonly>
+        <button onclick="calc1()">Calculate</button>
+        <input type="text" id="c1_res" class="output-box" readonly>
     </div>
 
-    <!-- Calculator 2 -->
+    <!-- Row 2 -->
     <div class="calc-row">
-        <input type="number" id="c2_v1" placeholder="">
+        <input type="number" id="c2_v1" placeholder="0">
         <span>is what percent of</span>
-        <input type="number" id="c2_v2" placeholder="">
+        <input type="number" id="c2_v2" placeholder="0">
         <span>?</span>
-        <button onclick="calc2()">CALCULATE</button>
-        <input type="text" id="c2_res" class="output-field" readonly>
-        <span>%</span>
+        <button onclick="calc2()">Calculate</button>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <input type="text" id="c2_res" class="output-box" readonly>
+            <span>%</span>
+        </div>
     </div>
 
-    <!-- Calculator 3 -->
+    <!-- Row 3 -->
     <div class="calc-row">
-        <div style="display:flex; flex-direction: column;">
-            <span>What is the percentage increase/decrease</span>
-            <div style="margin-top: 10px;">
-                <span>from</span>
-                <input type="number" id="c3_v1" placeholder="">
+        <div style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span>Percentage increase/decrease from</span>
+                <input type="number" id="c3_v1" placeholder="0">
                 <span>to</span>
-                <input type="number" id="c3_v2" placeholder="">
+                <input type="number" id="c3_v2" placeholder="0">
                 <span>?</span>
             </div>
         </div>
-        <button onclick="calc3()">CALCULATE</button>
-        <input type="text" id="c3_res" class="output-field" readonly>
-        <span>%</span>
+        <button onclick="calc3()">Calculate</button>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <input type="text" id="c3_res" class="output-box" readonly>
+            <span>%</span>
+        </div>
+        <div id="c3_multiplier" class="multiplier-text"></div>
     </div>
+</div>
 
-    <div class="tips-bar">
-        Tips: Use tab to move to the next field. Use shift-tab to move to the previous field. Press enter to calculate.
-    </div>
+<script>
+    function format(num) {
+        return parseFloat(num.toFixed(2)).toLocaleString();
+    }
 
-    <script>
-        // Formats numbers to avoid long decimals
-        function format(num) {
-            return parseFloat(num.toFixed(2));
+    // Row 1: What is X% of Y?
+    function calc1() {
+        const p = parseFloat(document.getElementById('c1_p').value);
+        const v = parseFloat(document.getElementById('c1_v').value);
+        if (!isNaN(p) && !isNaN(v)) {
+            document.getElementById('c1_res').value = format((p / 100) * v);
         }
+    }
 
-        // Logic for Row 1: What is X% of Y?
-        function calc1() {
-            const p = parseFloat(document.getElementById('c1_p').value);
-            const v = parseFloat(document.getElementById('c1_v').value);
-            if (!isNaN(p) && !isNaN(v)) {
-                document.getElementById('c1_res').value = format((p / 100) * v);
+    // Row 2: X is what % of Y?
+    function calc2() {
+        const v1 = parseFloat(document.getElementById('c2_v1').value);
+        const v2 = parseFloat(document.getElementById('c2_v2').value);
+        if (!isNaN(v1) && !isNaN(v2) && v2 !== 0) {
+            document.getElementById('c2_res').value = format((v1 / v2) * 100);
+        }
+    }
+
+    // Row 3: % Change + Multiplier logic
+    function calc3() {
+        const v1 = parseFloat(document.getElementById('c3_v1').value);
+        const v2 = parseFloat(document.getElementById('c3_v2').value);
+        const resBox = document.getElementById('c3_res');
+        const multBox = document.getElementById('c3_multiplier');
+
+        if (!isNaN(v1) && !isNaN(v2) && v1 !== 0) {
+            // Percentage calculation
+            const diff = v2 - v1;
+            const percentChange = (diff / v1) * 100;
+            resBox.value = format(percentChange);
+
+            // Multiplier calculation
+            const multiplier = v2 / v1;
+            const type = v2 >= v1 ? "increase" : "decrease";
+            multBox.innerText = `This is a ${multiplier.toFixed(2)}x ${type} (relative to original)`;
+        } else {
+            multBox.innerText = "";
+        }
+    }
+
+    // Allow "Enter" key to trigger calculations
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const row = e.target.closest('.calc-row');
+                row.querySelector('button').click();
             }
-        }
-
-        // Logic for Row 2: X is what percent of Y?
-        function calc2() {
-            const v1 = parseFloat(document.getElementById('c2_v1').value);
-            const v2 = parseFloat(document.getElementById('c2_v2').value);
-            if (!isNaN(v1) && !isNaN(v2) && v2 !== 0) {
-                document.getElementById('c2_res').value = format((v1 / v2) * 100);
-            }
-        }
-
-        // Logic for Row 3: % increase/decrease from X to Y?
-        function calc3() {
-            const v1 = parseFloat(document.getElementById('c3_v1').value);
-            const v2 = parseFloat(document.getElementById('c3_v2').value);
-            if (!isNaN(v1) && !isNaN(v2) && v1 !== 0) {
-                const diff = v2 - v1;
-                document.getElementById('c3_res').value = format((diff / v1) * 100);
-            }
-        }
-
-        // Listen for "Enter" key in any input to trigger calculation for that row
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    // Find the button within the same row and click it
-                    this.closest('.calc-row').querySelector('button').click();
-                }
-            });
         });
-    </script>
+    });
+</script>
 
 </body>
 </html>
