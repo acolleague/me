@@ -133,7 +133,7 @@
 
         .links-group {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
             margin-top: 24px;
         }
@@ -153,6 +153,15 @@
             background: var(--accent);
             border-color: var(--accent);
             color: white;
+        }
+
+        /* Special styling for the Streak link */
+        .btn-streak {
+            border-color: #f97316; /* Orange */
+        }
+        .btn-streak:hover {
+            background: #f97316;
+            border-color: #f97316;
         }
 
         /* --- Form --- */
@@ -266,7 +275,8 @@
                     <li style="margin-bottom: 12px;">🛠 <strong>Building:</strong> A home for colleagues</li>
                     <li style="margin-bottom: 12px;">🔍 <strong>Exploring:</strong> AI workflows / product ideas / new tools</li>
                     <li style="margin-bottom: 12px;">📚 <strong>Learning:</strong> How to move faster without breaking quality</li>
-                    <li>🧠 <strong>Thinking:</strong> How far AI can actually go in replacing workflows</li>
+                    <li style="margin-bottom: 12px;">🧠 <strong>Thinking:</strong> How far AI can actually go in replacing workflows</li>
+                    <li>🔥 <strong>Tracking:</strong> <a href="streak.html" style="color: var(--text); text-decoration: underline;">My Streak Wager</a></li>
                 </ul>
             </div>
         </section>
@@ -277,20 +287,17 @@
             <p>If you’re building, thinking differently, or exploring similar ideas—I’d like to hear from you.</p>
             
             <div class="links-group">
+                <a href="streak.html" class="btn btn-streak">My Streak Wager 🔥</a>
                 <a href="mailto:aicolleague@proton.me" class="btn">Email</a>
                 <a href="https://twitter.com/colleague" class="btn" target="_blank">Twitter / X</a>
                 <a href="https://linkedin.com/in/the-colleague" class="btn" target="_blank">LinkedIn</a>
             </div>
 
-            <!-- Formspree Integration -->
             <form action="https://formspree.io/f/aicolleague@proton.me" method="POST">
                 <input type="text" name="name" placeholder="Your Name" required>
                 <input type="email" name="_replyto" placeholder="Your Email" required>
                 <textarea name="message" placeholder="Send me something you’re working on..." required></textarea>
-                
-                <!-- Anti-spam and custom subject -->
                 <input type="hidden" name="_subject" value="New message from your personal website">
-                
                 <button type="submit" class="btn submit-btn">Send Message</button>
             </form>
         </section>
